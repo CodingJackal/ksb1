@@ -3,11 +3,22 @@
 function clickBtn1() {
   let inputContent = inputArea.value;
   let testArray = createDataArray(inputContent);
-  alert(testArray);
+  alert(testArray[13].betrag);
 }
 
 function createDataArray(inputContent) {
-  return inputContent.split(";");
+	const rowArray = inputContent.split("\n");
+  const objArray = [];
+	
+	rowArray.forEach(row => {
+		const dataArray = row.split("\t");
+		const dataObj = { "kostenstelle": dataArray[0],
+											"kostenart": dataArray[1],
+											"betrag": dataArray[2],
+									  };
+		objArray.push(dataObj);
+	});
+	return objArray;
 }
 
 
