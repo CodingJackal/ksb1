@@ -5,29 +5,31 @@ function clickBtn1() {
 }
 
 function processData(rawData) {
-	const rowArray = rawData.split("\n");
-	const header = rowArray[5].split("\t");
-	const emptyRowIds = findEmptyRows(header);
-	const dataObjects = createData(rowArray, header, emptyRowIds);
-	outputArea.value = dataObjects[895];	
+	const rowArray = rawData.split("\n");	
+	const header = createHeader(rowArray);
+	const dataObjects = createData(rowArray, header, emptyFirstRows);
+	showData(header);	
 }
 
-function findEmptyRows(header) {
-	const rowIds = [];
-	for (let i = 0; i < header.length; i++) {
-		if (header[i] == "") {
-			rowIds.push(i);
-		}
-	}
-	return rowIds;
+function showData(header) {
+	let stringi = "";
+	header.forEach((item) => { 
+		stringi += `${item}  `;
+	});
+	outputArea.value = stringi;
 }
 
-function createData(rowArray, header, emptyRowIds) {
+function createHeader(rowArray) {
+	const tmpData = rowArray[headerRow].split("\t");
+	tmpData.splice(0, emptyFirstRows);
+	return tmpData;
+}
+
+function createData(rowArray, header, emptyFirstRows) {
 	let rowData = [];
-	for (let i = 7; i < rowArray.length - 3; i++) {
-		const tmpData = rowArray[i].split("\t");
-		emptyRowIds.reverse().forEach(id => tmpData.splice(id,1));
-		//tmpData.splice(0,2);
+	for (let i = rmRowsTop; i < rowArray.length - rmRowsBottom; i++) {
+		const tmpData = rowArray[i].split("\t");		
+		tmpData.splice(0, emptyFirstRows);		
 		rowData.push(tmpData);
 	}
 	return rowData;
@@ -43,6 +45,12 @@ function uploadFile(fileInput) {
 		processData(rawData);
 	};	
 }
+
+// Statische Ankerpunkte zum Parsen der Datei
+const rmRowsTop = 7;
+const rmRowsBottom = 3;
+const headerRow = 5;
+const emptyFirstRows = 2;
 
 const button1 = document.getElementById("button1");
 const outputArea = document.getElementById("outputArea");
