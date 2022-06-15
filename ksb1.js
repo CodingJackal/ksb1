@@ -1,40 +1,50 @@
 'set strict'
 
-function clickBtn1() {
-  //let inputContent = inputArea.value;
-  //let testArray = createDataArray(inputContent);
-  alert(fileString.length);
+function clickBtn1() {    
+  //alert(rawData.length);
 }
 
-function createDataArray(inputContent) {
-	const rowArray = inputContent.split("\n");
-  const objArray = [];
-	
-	rowArray.forEach(row => {
-		const dataArray = row.split("\t");
-		const dataObj = { "kostenstelle": dataArray[0],
-											"kostenart": dataArray[1],
-											"betrag": dataArray[2],
-									  };
-		objArray.push(dataObj);
-	});
-	return objArray;
+function processData(rawData) {
+	const rowArray = rawData.split("\n");
+	const header = rowArray[5].split("\t");
+	const emptyRowIds = findEmptyRows(header);
+	const dataObjects = createData(rowArray, header, emptyRowIds);
+	outputArea.value = dataObjects[895];	
+}
+
+function findEmptyRows(header) {
+	const rowIds = [];
+	for (let i = 0; i < header.length; i++) {
+		if (header[i] == "") {
+			rowIds.push(i);
+		}
+	}
+	return rowIds;
+}
+
+function createData(rowArray, header, emptyRowIds) {
+	let rowData = [];
+	for (let i = 7; i < rowArray.length - 3; i++) {
+		const tmpData = rowArray[i].split("\t");
+		emptyRowIds.reverse().forEach(id => tmpData.splice(id,1));
+		//tmpData.splice(0,2);
+		rowData.push(tmpData);
+	}
+	return rowData;
 }
 
 function uploadFile(fileInput) {
 	let file = fileInput.files[0];
 	let reader = new FileReader();
 		
-	reader.readAsText(file);
+	reader.readAsText(file, "windows-1252");
 	reader.onload = function (e) {
-		fileString = e.target.result;
-	};
-	
+		const rawData = e.target.result;
+		processData(rawData);
+	};	
 }
 
-let fileString = "";
 const button1 = document.getElementById("button1");
-const inputArea = document.getElementById("inputArea");
 const outputArea = document.getElementById("outputArea");
 
 button1.addEventListener("click", clickBtn1);
