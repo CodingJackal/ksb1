@@ -12,8 +12,8 @@
     #left {
       display: flex;
       flex-direction: column;
-      width: 200px;      
-      padding: 50px;
+      width: 100px;      
+      padding: 20px;
     }    
     #outputBox {
       display: flex;
@@ -29,7 +29,9 @@
 <body>
   <div id="container">
   <div id="left"><input id="button1" type="button" value="button1"></div>
-  <div id="outputBox"><input type="file" onchange="uploadFile(this)"><textarea id="outputArea" cols="200" rows="20"></textarea></div>  
+  <div id="outputBox"><input type="file" onchange="uploadFile(this)">
+											<div id="checkBox"></div>
+											<textarea id="outputArea" cols="200" rows="20"></textarea></div>  
   </div>
   <script src="ksb1.js"></script>
 </body>
