@@ -1,21 +1,61 @@
 'set strict'
 
+/*
+ * Ohne Funktion.
+ */
 function clickBtn1() {    
   //alert(rawData.length);
 }
 
 function processData(rawData) {
 	const rowArray = rawData.split("\n");	
-	const header = createHeader(rowArray);
-	const dataObjects = createData(rowArray, header, emptyFirstRows);
-	createHeadElements(header);	
-	//outputArea.value = dataObjects[896];
+	header = createHeader(rowArray);
+	dataObjects = createData(rowArray, header, emptyFirstRows);
+
+	showFileStats(rowArray);
+	//createHeadElements(header);	
+	//outputArea.value = findRowByName(header, "Gegen");
 }
 
+/*
+ * Berechnet die Summe der Buchungen. Ohne 
+ * gesetzten Filter werden alle Buchungen summiert.
+ */
+function calculateSum(filterOne, filterTwo) {
+	const betragIndex = findRowByName(betragKopf);
+	let summe = 0;
+	for (let i = 0; i < dataObjects.length; i++) {
+		dataObjects[i].forEach((value, index) => {
+			if (index == betragIndex) {
+				summe += value;
+			}
+		});
+	}
+	return summe;
+}
+
+function findRowByName(searchStr) {
+	let index = -1;
+	for (let i = 0; i < header.length; i++) {
+		if (header[i].includes(searchStr)) {
+			index = i;
+			break;
+		}
+	}
+	return index;
+}
+
+function showFileStats(oneRow) {
+	const creationDate = oneRow[2].split("\t")[0];
+	const hardcodedSum = oneRow.at(-2).split("\t")[7];
+
+	outputArea.value = "Erstellungsdatum: " + creationDate + 
+										"\nSAP Summe: " + hardcodedSum +
+										"\nTest: " + calculateSum();
+}
+
+// Eigentlich ueberfluessig.
 function createHeadElements(header) {
-	//const test = document.createElement("input");
-	//test.setAttribute("type", "checkbox");
-	//document.getElementById("checkBox").appendChild(test);
 	header.forEach((head, index) => {
 		const input = document.createElement("input");
 		const label = document.createElement("label");
@@ -25,8 +65,7 @@ function createHeadElements(header) {
 		label.appendChild(input);
 		document.getElementById("checkBox").appendChild(label);
 		const content = document.createTextNode(head);
-		document.getElementById(labelId).appendChild(content);
-		//document.getElementById(labelId).innerText += head;
+		document.getElementById(labelId).appendChild(content);		
 	});
 	
 }
@@ -40,10 +79,12 @@ function createHeader(rowArray) {
 
 function createData(rowArray, header, emptyFirstRows) {
 	let rowData = [];
+	const betragIndex = findRowByName(betragKopf);
 	for (let i = rmRowsTop; i < rowArray.length - rmRowsBottom; i++) {
 		const tmpData = rowArray[i].split("\t");
 		tmpData.splice(emptyFourthRow, 1);
-		tmpData.splice(0, emptyFirstRows);		
+		tmpData.splice(0, emptyFirstRows);
+		tmpData[betragIndex] = parseFloat(tmpData[betragIndex].replace(".","").replace(",","."));		
 		rowData.push(tmpData);
 	}
 	return rowData;
@@ -61,11 +102,16 @@ function uploadFile(fileInput) {
 }
 
 // Statische Ankerpunkte zum Parsen der Datei
+const betragKopf = "Wert";
 const rmRowsTop = 7;
 const rmRowsBottom = 3;
 const headerRow = 5;
 const emptyFirstRows = 2;
 const emptyFourthRow = 4;
+
+// Bereinigte Datenvariablen
+let header = [];
+let dataObjects = [];
 
 const button1 = document.getElementById("button1");
 const outputArea = document.getElementById("outputArea");
