@@ -4,7 +4,22 @@
  * Ohne Funktion.
  */
 function clickBtn1() {
-  //alert(rawData.length);
+	const kostenstelleId = findRowByName("Kostenst");
+	const kostenartId = findRowByName("Kostenart");
+	let tmpArr = [];
+	
+	for (let i = 0; i < dataObjects.length; i++) {
+		ruleSet.kostenstelle.forEach(kostenstelle => {
+			if (dataObjects[i][kostenstelleId] == kostenstelle) {
+				tmpArr.push(dataObjects[i]);
+			}
+		})
+	};
+  outputArea.value = 
+		"Placeholder1: " + ruleSet.kostenstelle +
+		"\nPlaceholder2: " + ruleSet.kostenart +
+		"\nPlaceholder3: " + tmpArr.length +
+		"\nPlacehodler4: " + calculateSum(tmpArr);
 }
 
 function processData(rawData) {
@@ -18,14 +33,13 @@ function processData(rawData) {
 }
 
 /*
- * Berechnet die Summe der Buchungen. Ohne
- * gesetzten Filter werden alle Buchungen summiert.
+ * Berechnet die Summe der Objekte.
  */
-function calculateSum(filterOne, filterTwo) {
+function calculateSum(objectArr) {
   const betragIndex = findRowByName(betragKopf);
   let summe = 0;
-  for (let i = 0; i < dataObjects.length; i++) {
-    dataObjects[i].forEach((value, index) => {
+  for (let i = 0; i < objectArr.length; i++) {
+    objectArr[i].forEach((value, index) => {
       if (index == betragIndex) {
         summe += value;
       }
@@ -54,8 +68,8 @@ function showFileStats(oneRow) {
     creationDate +
     "\nSAP Summe: " +
     hardcodedSum +
-    "\nTest: " +
-    calculateSum().toLocaleString("de-DE");
+    "\nBerechnete Summe: " +
+    calculateSum(dataObjects).toLocaleString("de-DE");
 }
 
 // Eigentlich ueberfluessig.
