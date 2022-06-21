@@ -4,32 +4,38 @@
  * Ohne Funktion.
  */
 function clickBtn1() {
-	const kostenstelleId = findRowByName("Kostenst");
-	const kostenartId = findRowByName("Kostenart");
-	let tmpArr = [];
-	
-	for (let i = 0; i < dataObjects.length; i++) {
-		ruleSet.kostenstelle.forEach(kostenstelle => {
-			if (dataObjects[i][kostenstelleId] == kostenstelle) {
-				tmpArr.push(dataObjects[i]);
-			}
-		})
-	};
-  outputArea.value = 
-		"Placeholder1: " + ruleSet.kostenstelle +
-		"\nPlaceholder2: " + ruleSet.kostenart +
-		"\nPlaceholder3: " + tmpArr.length +
-		"\nPlacehodler4: " + calculateSum(tmpArr);
+  executeRule(ruleSet[0]);
+}
+
+function executeRule(rule) {
+  const kostenstelleId = findRowByName("Kostenst");
+  const kostenartId = findRowByName("Kostenart");
+  let tmpArr = [];
+
+  for (let i = 0; i < dataObjects.length; i++) {
+    rule.kostenstelle.forEach((kostenstelle) => {
+      if (dataObjects[i][kostenstelleId] == kostenstelle) {
+        tmpArr.push(dataObjects[i]);
+      }
+    });
+  }
+  outputArea.value =
+    "Placeholder1: " +
+    ruleSet.kostenstelle +
+    "\nPlaceholder2: " +
+    ruleSet.kostenart +
+    "\nPlaceholder3: " +
+    tmpArr.length +
+    "\nPlacehodler4: " +
+    calculateSum(tmpArr);
 }
 
 function processData(rawData) {
   const rowArray = rawData.split("\n");
   header = createHeader(rowArray);
   dataObjects = createData(rowArray, header, emptyFirstRows);
-
+  createLeftButtons();
   showFileStats(rowArray);
-  //createHeadElements(header);
-  //outputArea.value = findRowByName(header, "Gegen");
 }
 
 /*
@@ -70,6 +76,18 @@ function showFileStats(oneRow) {
     hardcodedSum +
     "\nBerechnete Summe: " +
     calculateSum(dataObjects).toLocaleString("de-DE");
+}
+
+function createLeftButtons() {
+  const leftDivBox = document.getElementById("left");
+  ruleSet.forEach((rule) => {
+    const input = document.createElement("input");
+    const inputId = rule.name;
+    input.setAttribute("type", "button");
+    input.setAttribute("id", inputId);
+    input.setAttribute("value", inputId);
+    leftDivBox.appendChild(input);
+  });
 }
 
 // Eigentlich ueberfluessig.
@@ -132,7 +150,7 @@ const emptyFourthRow = 4;
 let header = [];
 let dataObjects = [];
 
-const button1 = document.getElementById("button1");
+//const button1 = document.getElementById("button1");
 const outputArea = document.getElementById("outputArea");
 
-button1.addEventListener("click", clickBtn1);
+//button1.addEventListener("click", clickBtn1);
