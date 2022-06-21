@@ -7,13 +7,21 @@ function clickBtn1() {
   executeRule(ruleSet[0]);
 }
 
-function executeRule(rule) {
+function executeRule(ruleName) {
+  // Feststellen, wo sich unserer Regel befindet.
+  let ruleId = -1;
+  ruleSet.forEach((rule, index) => {
+    if (rule.name == ruleName) {
+      ruleId = index;
+    }
+  });
+
   const kostenstelleId = findRowByName("Kostenst");
   const kostenartId = findRowByName("Kostenart");
   let tmpArr = [];
 
   for (let i = 0; i < dataObjects.length; i++) {
-    rule.kostenstelle.forEach((kostenstelle) => {
+    ruleSet[ruleId].kostenstelle.forEach((kostenstelle) => {
       if (dataObjects[i][kostenstelleId] == kostenstelle) {
         tmpArr.push(dataObjects[i]);
       }
@@ -21,12 +29,12 @@ function executeRule(rule) {
   }
   outputArea.value =
     "Placeholder1: " +
-    ruleSet.kostenstelle +
+    ruleSet[ruleId].kostenstelle +
     "\nPlaceholder2: " +
-    ruleSet.kostenart +
+    ruleSet[ruleId].kostenart +
     "\nPlaceholder3: " +
     tmpArr.length +
-    "\nPlacehodler4: " +
+    "\nPlaceholder4: " +
     calculateSum(tmpArr);
 }
 
@@ -35,7 +43,7 @@ function processData(rawData) {
   header = createHeader(rowArray);
   dataObjects = createData(rowArray, header, emptyFirstRows);
   createLeftButtons();
-  showFileStats(rowArray);
+  //showFileStats(rowArray);
 }
 
 /*
@@ -86,7 +94,16 @@ function createLeftButtons() {
     input.setAttribute("type", "button");
     input.setAttribute("id", inputId);
     input.setAttribute("value", inputId);
+    input.setAttribute("class", "leftButtons");
     leftDivBox.appendChild(input);
+  });
+  const leftBox = document.getElementById("left");
+  leftBox.addEventListener("click", (event) => {
+    const isButton = event.target.nodeName === "INPUT";
+    if (!isButton) {
+      return;
+    }
+    executeRule(event.target.id);
   });
 }
 
