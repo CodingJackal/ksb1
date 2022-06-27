@@ -15,18 +15,8 @@ function executeRule(ruleName) {
       ruleId = index;
     }
   });
-
-  const kostenstelleId = findRowByName("Kostenst");
-  const kostenartId = findRowByName("Kostenart");
-  let tmpArr = [];
-
-  for (let i = 0; i < dataObjects.length; i++) {
-    ruleSet[ruleId].kostenstelle.forEach((kostenstelle) => {
-      if (dataObjects[i][kostenstelleId] == kostenstelle) {
-        tmpArr.push(dataObjects[i]);
-      }
-    });
-  }
+  const tmpArr = filterRuleKst(ruleId);
+  // Zusammenfassung anzeigen
   outputArea.value =
     "Placeholder1: " +
     ruleSet[ruleId].kostenstelle +
@@ -36,21 +26,38 @@ function executeRule(ruleName) {
     tmpArr.length +
     "\nPlaceholder4: " +
     calculateSum(tmpArr);
+  // Datensaetze anzeigen
+  tmpArr.forEach((obj) => {
+    outputArea.value += `\n${obj[kostenstelleIndex]}\t${obj[kostenartIndex]}\t${obj[betragIndex]}`;
+  });
+}
+
+function filterRuleKst(ruleId) {
+  let tmpArr = [];
+  for (let i = 0; i < dataObjects.length; i++) {
+    ruleSet[ruleId].kostenstelle.forEach((kostenstelle) => {
+      if (dataObjects[i][kostenstelleIndex] == kostenstelle) {
+        tmpArr.push(dataObjects[i]);
+      }
+    });
+  }
+  return tmpArr;
 }
 
 function processData(rawData) {
   const rowArray = rawData.split("\n");
   header = createHeader(rowArray);
   dataObjects = createData(rowArray, header, emptyFirstRows);
+  betragIndex = findRowByName(betragKopf);
+  kostenstelleIndex = findRowByName("Kostenst");
+  kostenartIndex = findRowByName("Kostenart");
   createLeftButtons();
-  //showFileStats(rowArray);
 }
 
 /*
  * Berechnet die Summe der Objekte.
  */
 function calculateSum(objectArr) {
-  const betragIndex = findRowByName(betragKopf);
   let summe = 0;
   for (let i = 0; i < objectArr.length; i++) {
     objectArr[i].forEach((value, index) => {
@@ -88,6 +95,8 @@ function showFileStats(oneRow) {
 
 function createLeftButtons() {
   const leftDivBox = document.getElementById("left");
+  leftDivBox.replaceChildren();
+  outputArea.value = "";
   ruleSet.forEach((rule) => {
     const input = document.createElement("input");
     const inputId = rule.name;
@@ -163,9 +172,12 @@ const headerRow = 5;
 const emptyFirstRows = 2;
 const emptyFourthRow = 4;
 
-// Bereinigte Datenvariablen
+// Bereinigte Datenvariablen und ermittelte Ankerpunkte
 let header = [];
 let dataObjects = [];
+let betragIndex = -1;
+let kostenstelleIndex = -1;
+let kostenartIndex = -1;
 
 //const button1 = document.getElementById("button1");
 const outputArea = document.getElementById("outputArea");
