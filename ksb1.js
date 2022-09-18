@@ -153,6 +153,7 @@ function createData(rowArray, header, emptyFirstRows) {
   return rowData;
 }
 
+// Einlesen der Datei
 function uploadFile(fileInput) {
   let file = fileInput.files[0];
   let reader = new FileReader();
