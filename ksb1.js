@@ -32,6 +32,7 @@ function executeRule(ruleName) {
   });
 }
 
+// Filterfunktion. Hier STERNCHEN einfuegen.
 function filterRuleKst(ruleId) {
   let tmpArr = [];
   for (let i = 0; i < dataObjects.length; i++) {
