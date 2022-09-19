@@ -34,4 +34,12 @@ ruleSet = [
     targetKst: ["67404998"],
     percent: 100,
   },
+  {
+    name: "Delta332",
+    action: "show",
+    kostenstelle: ["6745*"],
+    kostenart: ["41111000"],
+    targetKst: ["67404998"],
+    percent: 100,
+  },
 ];

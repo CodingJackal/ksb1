@@ -32,12 +32,18 @@ function executeRule(ruleName) {
   });
 }
 
-// Filterfunktion. Hier STERNCHEN einfuegen.
+// Filterfunktion. Vorerst nur fuer Kostenstellen.
 function filterRuleKst(ruleId) {
   let tmpArr = [];
   for (let i = 0; i < dataObjects.length; i++) {
     ruleSet[ruleId].kostenstelle.forEach((kostenstelle) => {
-      if (dataObjects[i][kostenstelleIndex] == kostenstelle) {
+      if (kostenstelle.includes("*")) {
+        const asterisIndex = kostenstelle.indexOf("*");
+        const strBeforeAsterisk = kostenstelle.substring(0, asterisIndex);
+        if (dataObjects[i][kostenstelleIndex].startsWith(strBeforeAsterisk)) {
+          tmpArr.push(dataObjects[i]);
+        }
+      } else if (dataObjects[i][kostenstelleIndex] == kostenstelle) {
         tmpArr.push(dataObjects[i]);
       }
     });
