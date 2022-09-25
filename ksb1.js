@@ -15,38 +15,71 @@ function executeRule(ruleName) {
       ruleId = index;
     }
   });
-  const tmpArr = filterRuleKst(ruleId);
+  //const tmpArr = filterRuleKst(ruleId);
+  const tmpArr = filterRule(ruleId);
   // Zusammenfassung anzeigen
   outputArea.value =
     "Placeholder1: " +
     ruleSet[ruleId].kostenstelle +
     "\nPlaceholder2: " +
     ruleSet[ruleId].kostenart +
-    "\nPlaceholder3: " +
+    "\nDatensaetze: " +
     tmpArr.length +
-    "\nPlaceholder4: " +
-    calculateSum(tmpArr);
+    "\nSumme: " +
+    calculateSum(tmpArr) +
+    `\n`;
   // Datensaetze anzeigen
   tmpArr.forEach((obj) => {
     outputArea.value += `\n${obj[kostenstelleIndex]}\t${obj[kostenartIndex]}\t${obj[betragIndex]}`;
+    //outputArea.value += `${obj},`;
   });
 }
 
-// Filterfunktion. Vorerst nur fuer Kostenstellen.
-function filterRuleKst(ruleId) {
+// Alternative Filterfunktion. ACHTUNG: NICHT AKTIV!
+function filterRule(ruleId) {
+  let kstWildcards = [];
+  let filterKst = [];
+  let karWildcards = [];
+  let filterKar = [];
   let tmpArr = [];
-  for (let i = 0; i < dataObjects.length; i++) {
-    ruleSet[ruleId].kostenstelle.forEach((kostenstelle) => {
-      if (kostenstelle.includes("*")) {
-        const asterisIndex = kostenstelle.indexOf("*");
-        const strBeforeAsterisk = kostenstelle.substring(0, asterisIndex);
-        if (dataObjects[i][kostenstelleIndex].startsWith(strBeforeAsterisk)) {
-          tmpArr.push(dataObjects[i]);
-        }
-      } else if (dataObjects[i][kostenstelleIndex] == kostenstelle) {
-        tmpArr.push(dataObjects[i]);
+  // Sammle alle (Wildcard)Kostenstellen
+  ruleSet[ruleId].kostenstelle.forEach((kostenstelle) => {
+    if (kostenstelle.includes("*")) {
+      kstWildcards.push(kostenstelle.substring(0, kostenstelle.indexOf("*")));
+    } else {
+      filterKst.push(kostenstelle);
+    }
+  });
+  // Sammle alle (Wildcard)Kostenarten
+  ruleSet[ruleId].kostenart.forEach((kostenart) => {
+    if (kostenart.includes("*")) {
+      karWildcards.push(kostenart.substring(0, kostenart.indexOf("*")));
+    } else {
+      filterKar.push(kostenart);
+    }
+  });
+  // Filter!
+  dataObjects.forEach((object) => {
+    if (
+      filterKst.includes(object[kostenstelleIndex]) ||
+      wildcardMatch(object[kostenstelleIndex], kstWildcards)
+    ) {
+      if (
+        filterKar.includes(object[kostenartIndex]) ||
+        wildcardMatch(object[kostenartIndex], karWildcards)
+      ) {
+        tmpArr.push(object);
       }
-    });
+    }
+  });
+
+  // Teste String auf WildcardArray - Function in Function
+  function wildcardMatch(str, searchAry) {
+    for (let i = 0; i < searchAry.length; i++) {
+      if (str.startsWith(searchAry[i])) {
+        return true;
+      }
+    }
   }
   return tmpArr;
 }
@@ -113,6 +146,7 @@ function createLeftButtons() {
     input.setAttribute("class", "leftButtons");
     leftDivBox.appendChild(input);
   });
+  // Ist die Zeile nicht redundant?
   const leftBox = document.getElementById("left");
   leftBox.addEventListener("click", (event) => {
     const isButton = event.target.nodeName === "INPUT";
