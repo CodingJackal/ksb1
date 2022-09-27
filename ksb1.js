@@ -15,7 +15,6 @@ function executeRule(ruleName) {
       ruleId = index;
     }
   });
-  //const tmpArr = filterRuleKst(ruleId);
   const tmpArr = filterRule(ruleId);
   // Zusammenfassung anzeigen
   outputArea.value =
@@ -31,11 +30,9 @@ function executeRule(ruleName) {
   // Datensaetze anzeigen
   tmpArr.forEach((obj) => {
     outputArea.value += `\n${obj[kostenstelleIndex]}\t${obj[kostenartIndex]}\t${obj[betragIndex]}`;
-    //outputArea.value += `${obj},`;
   });
 }
 
-// Alternative Filterfunktion. ACHTUNG: NICHT AKTIV!
 function filterRule(ruleId) {
   let kstWildcards = [];
   let filterKst = [];
@@ -91,6 +88,7 @@ function processData(rawData) {
   betragIndex = findRowByName(betragKopf);
   kostenstelleIndex = findRowByName("Kostenst");
   kostenartIndex = findRowByName("Kostenart");
+  showFileStats(rowArray);
   createLeftButtons();
 }
 
@@ -120,17 +118,21 @@ function findRowByName(searchStr) {
   return index;
 }
 
-function showFileStats(oneRow) {
-  const creationDate = oneRow[2].split("\t")[0];
-  const hardcodedSum = oneRow.at(-2).split("\t")[7];
+function showFileStats(rowArray) {
+  const creationDate = rowArray[2].split("\t")[0];
+  const hardcodedSum = rowArray.at(-2).split("\t")[7];
+  const sumToNum = parseFloat(
+    hardcodedSum.replaceAll(".", "").replace(",", ".")
+  );
+  const calcSum = calculateSum(dataObjects);
+  const difference = calcSum - sumToNum;
 
-  outputArea.value =
-    "Erstellungsdatum: " +
-    creationDate +
-    "\nSAP Summe: " +
-    hardcodedSum +
-    "\nBerechnete Summe: " +
-    calculateSum(dataObjects).toLocaleString("de-DE");
+  fileStatsArea.innerText = "Erstellungsdatum: " + creationDate + "\n";
+  fileStatsArea.innerText += "Periode: PLATZHALTER\n";
+  fileStatsArea.innerText += "SAP Summe: " + hardcodedSum + "\n";
+  fileStatsArea.innerText +=
+    "Berechnete Summe: " + calcSum.toLocaleString("de-DE") + "\n";
+  fileStatsArea.innerText += "Differenz: " + difference.toLocaleString("de-DE");
 }
 
 function createLeftButtons() {
@@ -186,8 +188,9 @@ function createData(rowArray, header, emptyFirstRows) {
     const tmpData = rowArray[i].split("\t");
     tmpData.splice(emptyFourthRow, 1);
     tmpData.splice(0, emptyFirstRows);
+    // String nach Number
     tmpData[betragIndex] = parseFloat(
-      tmpData[betragIndex].replace(".", "").replace(",", ".")
+      tmpData[betragIndex].replaceAll(".", "").replace(",", ".")
     );
     rowData.push(tmpData);
   }
@@ -222,6 +225,7 @@ let kostenstelleIndex = -1;
 let kostenartIndex = -1;
 
 //const button1 = document.getElementById("button1");
-const outputArea = document.getElementById("outputArea");
+const outputArea = document.getElementById("bottom");
+const fileStatsArea = document.getElementById("top");
 
 //button1.addEventListener("click", clickBtn1);
